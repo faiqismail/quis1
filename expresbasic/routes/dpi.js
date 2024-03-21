@@ -2,7 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Model_DPI = require('../model/model_dpi');
 
-router.get('/', async function(req, res, next) {
+function requireLogin(req, res, next) {
+    if (req.session && req.session.userId) {
+        return next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+router.get('/', requireLogin, async function(req, res, next) {
     try {
         let rows = await Model_DPI.getAll();
         res.render('dpi/index', {
@@ -13,14 +21,14 @@ router.get('/', async function(req, res, next) {
     }
 });
 
-router.get('/create', function (req, res, next) {
+router.get('/create', requireLogin, function (req, res, next) {
     res.render('dpi/create', {
         nama_dpi: '',
         luas: ''
     });
 });
 
-router.get('/edit/:id', async function (req, res, next) {
+router.get('/edit/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         let dpi = await Model_DPI.getById(id);
@@ -34,7 +42,7 @@ router.get('/edit/:id', async function (req, res, next) {
     }
 });
 
-router.post('/store', async function (req, res, next) {
+router.post('/store', requireLogin, async function (req, res, next) {
     try {
         let { nama_dpi, luas } = req.body;
         await Model_DPI.create({ nama_dpi, luas });
@@ -46,7 +54,7 @@ router.post('/store', async function (req, res, next) {
     }
 });
 
-router.post('/update/:id', async function (req, res, next) {
+router.post('/update/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         let { nama_dpi, luas } = req.body;
@@ -59,7 +67,7 @@ router.post('/update/:id', async function (req, res, next) {
     }
 });
 
-router.get('/delete/:id', async function (req, res, next) {
+router.get('/delete/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         await Model_DPI.delete(id);

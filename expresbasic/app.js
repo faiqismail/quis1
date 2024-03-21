@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var flash = require('express-flash');
 var session = require('express-session');
+const MemoryStore = require('session-memory-store')(session);
 
 // Import file-route yang dibutuhkan
 var indexRouter = require('./routes/index');
@@ -17,7 +18,9 @@ var keahlianRouter = require('./routes/keahlian');
 var pemilikRouter = require ('./routes/pemilik');
 var dpiRouter = require ('./routes/dpi');
 var alat_tangkapRouter= require ('./routes/alat_tangkap');
-var kapalRouter = require ('./routes/kapal')
+var kapalRouter = require ('./routes/kapal');
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
 // Inisialisasi aplikasi Express
 var app = express();
 
@@ -35,9 +38,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Setup session
 app.use(session({
   cookie: {
-      maxAge: 6000
+      maxAge: 60000000000,
+      secure: false,
+      httpOnly: true,
+      samesite:'strict',
   },
-  store: new session.MemoryStore(),
+  store: new MemoryStore(),
   saveUninitialized: true,
   resave: true,
   secret: 'secret'
@@ -56,7 +62,8 @@ app.use('/keahlian',keahlianRouter);
 app.use('/pemilik',pemilikRouter);
 app.use('/dpi',dpiRouter);
 app.use('/alat_tangkap',alat_tangkapRouter);
-app.use('/kapal',kapalRouter)
+app.use('/kapal',kapalRouter);
+
 // Middleware untuk menangani error 404 (Not Found)
 app.use(function(req, res, next) {
   next(createError(404));

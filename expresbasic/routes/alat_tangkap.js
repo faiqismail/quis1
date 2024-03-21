@@ -2,7 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Model_AlatTangkap = require('../model/model_alat_tangkap');
 
-router.get('/', async function(req, res, next) {
+
+function requireLogin(req, res, next) {
+    if (req.session && req.session.userId) {
+        return next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+// Terapkan middleware requireLogin pada setiap route yang ingin Anda proteksi
+router.get('/', requireLogin, async function(req, res, next) {
     try {
         let rows = await Model_AlatTangkap.getAll();
         res.render('alat_tangkap/index', {
@@ -13,13 +23,13 @@ router.get('/', async function(req, res, next) {
     }
 });
 
-router.get('/create', function (req, res, next) {
+router.get('/create', requireLogin, function (req, res, next) {
     res.render('alat_tangkap/create', {
         nama_alat_tangkap: ''
     });
 });
 
-router.get('/edit/:id', async function (req, res, next) {
+router.get('/edit/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         let alat_tangkap = await Model_AlatTangkap.getById(id);
@@ -32,7 +42,7 @@ router.get('/edit/:id', async function (req, res, next) {
     }
 });
 
-router.post('/store', async function (req, res, next) {
+router.post('/store', requireLogin, async function (req, res, next) {
     try {
         let { nama_alat_tangkap } = req.body;
         await Model_AlatTangkap.create({ nama_alat_tangkap });
@@ -44,7 +54,7 @@ router.post('/store', async function (req, res, next) {
     }
 });
 
-router.post('/update/:id', async function (req, res, next) {
+router.post('/update/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         let { nama_alat_tangkap } = req.body;
@@ -57,7 +67,7 @@ router.post('/update/:id', async function (req, res, next) {
     }
 });
 
-router.get('/delete/:id', async function (req, res, next) {
+router.get('/delete/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         await Model_AlatTangkap.delete(id);

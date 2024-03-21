@@ -2,7 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Model_Pemilik = require('../model/model_pemilik');
 
-router.get('/', async function(req, res, next) {
+function requireLogin(req, res, next) {
+    if (req.session && req.session.userId) {
+        return next();
+    } else {
+        res.redirect('/login'); 
+    }
+}
+
+
+router.get('/', requireLogin, async function(req, res, next) {
     try {
         let rows = await Model_Pemilik.getAll();
         res.render('pemilik/index', {
@@ -13,7 +22,7 @@ router.get('/', async function(req, res, next) {
     }
 });
 
-router.get('/create', function (req, res, next) {
+router.get('/create', requireLogin, function (req, res, next) {
     res.render('pemilik/create', {
         nama_pemilik: '',
         alamat: '',
@@ -21,7 +30,7 @@ router.get('/create', function (req, res, next) {
     });
 });
 
-router.get('/edit/:id', async function (req, res, next) {
+router.get('/edit/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         let pemilik = await Model_Pemilik.getById(id);
@@ -36,7 +45,7 @@ router.get('/edit/:id', async function (req, res, next) {
     }
 });
 
-router.post('/store', async function (req, res, next) {
+router.post('/store', requireLogin, async function (req, res, next) {
     try {
         let { nama_pemilik, alamat, no_hp } = req.body;
         await Model_Pemilik.create({ nama_pemilik, alamat, no_hp });
@@ -48,7 +57,7 @@ router.post('/store', async function (req, res, next) {
     }
 });
 
-router.post('/update/:id', async function (req, res, next) {
+router.post('/update/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         let { nama_pemilik, alamat, no_hp } = req.body;
@@ -61,7 +70,7 @@ router.post('/update/:id', async function (req, res, next) {
     }
 });
 
-router.get('/delete/:id', async function (req, res, next) {
+router.get('/delete/:id', requireLogin, async function (req, res, next) {
     try {
         let id = req.params.id;
         await Model_Pemilik.delete(id);
