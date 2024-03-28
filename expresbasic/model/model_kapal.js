@@ -1,6 +1,8 @@
 const connection = require("../config/database");
 
 class ModelKapal {
+
+  
   static async getAll() {
     return new Promise((resolve, reject) => {
       connection.query(

@@ -21,6 +21,8 @@ var alat_tangkapRouter= require ('./routes/alat_tangkap');
 var kapalRouter = require ('./routes/kapal');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var superusersRouter =require('./routes/superusers');
+var produkRouter = require('./routes/produk');
 // Inisialisasi aplikasi Express
 var app = express();
 
@@ -63,7 +65,8 @@ app.use('/pemilik',pemilikRouter);
 app.use('/dpi',dpiRouter);
 app.use('/alat_tangkap',alat_tangkapRouter);
 app.use('/kapal',kapalRouter);
-
+app.use('/superusers',superusersRouter);
+app.use('/produk',produkRouter);
 // Middleware untuk menangani error 404 (Not Found)
 app.use(function(req, res, next) {
   next(createError(404));

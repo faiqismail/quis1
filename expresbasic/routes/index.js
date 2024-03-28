@@ -37,8 +37,17 @@ router.post('/log', async (req, res) => {
             let cek = await bcrypt.compare(password, enkripsi);
             if (cek) {
                 req.session.userId = Data[0].id_users;
-                req.flash('success', 'Berhasil login');
-                res.redirect('/users');
+
+                if (Data[0].level_users == 1) {
+                    req.flash('success', 'Berhasil login');
+                    res.redirect('/superusers');
+                } else if (Data[0].level_users == 2) {
+                    req.flash('success', 'Berhasil login');
+                    res.redirect('/users');
+                } else {
+                    res.redirect('/login');
+                }
+                // akhir kondisi
             } else {
                 req.flash('error', 'Email atau password salah');
                 res.redirect('/login');
@@ -48,11 +57,11 @@ router.post('/log', async (req, res) => {
             res.redirect('/login');
         }
     } catch (err) {
-        console.error(err);
-        req.flash('error', 'Error pada fungsi');
         res.redirect('/login');
+        req.flash('error', 'Error pada fungsi');
     }
 });
+
 
 router.get('/logout', function (req, res) {
     req.session.destroy(function (err) {
